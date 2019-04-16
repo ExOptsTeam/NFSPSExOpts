@@ -8,7 +8,7 @@
 
 DWORD WINAPI Thing(LPVOID);
 
-bool once1 = 0, once2 = 0;
+bool once1 = 0, once2 = 0, once3 = 0;
 bool bWindowedMode, CenterWindow, SkipMovies, SkipNISs, IsPlayerNameSet, ExOptsTeamTakeOver, UnlockAllThings, IsOnFocus, EnableSound, EnableMusic, EnableVoice, AutoDrive, DriftMode, ShowMessage, EnableSaveLoadHotPos, UnlockDLC, ShowAllCarsInFE, ShowSpecialVinyls, EnableDebugWorldCamera, DebugCamStatus, DebugWatchCarCamera, GarageZoom, GarageRotate, GarageShowcase;
 int ThreadDelay, StartingCash, hotkeyUnlockAllThings, hotkeyAutoDrive, hotkeyPhysSwitch, hotkeyFreezeCamera, hotkeyToggleHeadlights, MaximumLaps, MaximumRepairMarkers;
 char* IntroMovieName, *PlayerName;
@@ -384,7 +384,7 @@ DWORD WINAPI Thing(LPVOID)
 		IsOnFocus = !(*(bool*)0xAC1055);
 
 		// Center game window (frameless only)
-		if (bWindowedMode && CenterWindow && windowHandle && !once2)
+		if (bWindowedMode && CenterWindow && windowHandle && !once3)
 		{
 			HWND hwndScreen;
 			RECT rectScreen, rectGame;
@@ -398,7 +398,7 @@ DWORD WINAPI Thing(LPVOID)
 
 			SetWindowPos(windowHandle, NULL, XPos, YPos, (rectGame.right - rectGame.left), (rectGame.bottom - rectGame.top), SWP_NOZORDER);
 
-			once2 = 1;
+			once3 = 1;
 		}
 
 		if ((GetAsyncKeyState(hotkeyUnlockAllThings) & 1) && IsOnFocus) // Unlock All Things
