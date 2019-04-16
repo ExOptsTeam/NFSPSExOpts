@@ -9,7 +9,7 @@
 DWORD WINAPI Thing(LPVOID);
 
 bool once1 = 0, once2 = 0;
-bool SkipMovies, SkipNISs, IsPlayerNameSet, ExOptsTeamTakeOver, UnlockAllThings, IsOnFocus, EnableSound, EnableMusic, EnableVoice, AutoDrive, DriftMode, ShowMessage, EnableSaveLoadHotPos, UnlockDLC, ShowAllCarsInFE, ShowSpecialVinyls, EnableDebugWorldCamera, DebugCamStatus, DebugWatchCarCamera, GarageZoom, GarageRotate, GarageShowcase;
+bool bWindowedMode, CenterWindow, SkipMovies, SkipNISs, IsPlayerNameSet, ExOptsTeamTakeOver, UnlockAllThings, IsOnFocus, EnableSound, EnableMusic, EnableVoice, AutoDrive, DriftMode, ShowMessage, EnableSaveLoadHotPos, UnlockDLC, ShowAllCarsInFE, ShowSpecialVinyls, EnableDebugWorldCamera, DebugCamStatus, DebugWatchCarCamera, GarageZoom, GarageRotate, GarageShowcase;
 int ThreadDelay, StartingCash, hotkeyUnlockAllThings, hotkeyAutoDrive, hotkeyPhysSwitch, hotkeyFreezeCamera, hotkeyToggleHeadlights, MaximumLaps, MaximumRepairMarkers;
 char* IntroMovieName, *PlayerName;
 DWORD GameState;
@@ -207,7 +207,7 @@ void Init()
 	StartingCash = iniReader.ReadInteger("Gameplay", "StartingCash", 10000);
 	UnlockAllThings = iniReader.ReadInteger("Gameplay", "UnlockAllThings", 1) == 1;
 	UnlockDLC = iniReader.ReadInteger("Gameplay", "UnlockDLC", 1) == 1;
-	ShowAllCarsInFE = iniReader.ReadInteger("Gameplay", "UnlockDLC", 1) == 1;
+	ShowAllCarsInFE = iniReader.ReadInteger("Gameplay", "ShowAllCarsInFE", 1) == 1;
 
 	// Misc
 	SkipMovies = iniReader.ReadInteger("Misc", "SkipMovies", 0) == 1;
@@ -218,6 +218,7 @@ void Init()
 	ShowMessage = iniReader.ReadInteger("Misc", "ShowMessage", 1) == 1;
 	//AllowMultipleInstances = iniReader.ReadInteger("Misc", "AllowMultipleInstances", 0) == 1;
 	ThreadDelay = iniReader.ReadInteger("Misc", "ThreadDelay", 5);
+	CenterWindow = iniReader.ReadInteger("Misc", "CenterWindow", 1) == 1;
 
 	// Restrictions (wrap values around)
 	MaximumLaps %= 128;
@@ -230,8 +231,8 @@ void Init()
 
 	// Set maximum repair marker count
 	injector::WriteMemory<BYTE>(0x56FDD6, MaximumRepairMarkers + 1, true); // DALRaceDayCommands::GetRaceDaySlotOptionsForIndex::Execute
-	injector::MakeJMP(0x7DE64D, RepairMarkerCodeCave_HighlightNextSetting, true);
-	injector::MakeRangedNOP(0x7DE658, 0x7DE65B, true); // FERaceDayManageScreen::HighlightNextSetting
+	// injector::MakeJMP(0x7DE64D, RepairMarkerCodeCave_HighlightNextSetting, true);
+	// injector::MakeRangedNOP(0x7DE658, 0x7DE65B, true); // FERaceDayManageScreen::HighlightNextSetting
 	injector::MakeJMP(0x7de827, RepairMarkerStringCodeCave_HighlightPrevSetting, true);
 	injector::MakeJMP(0x7DE6F0, RepairMarkerStringCodeCave_HighlightNextSetting, true);
 	injector::MakeJMP(0x7DE20D, RepairMarkerStringCodeCave_DisplayRaceDaySettings, true);
@@ -379,7 +380,26 @@ DWORD WINAPI Thing(LPVOID)
 
 		GameState = *(DWORD*)0xABB510; // 3 = FE, 4&5 = Loading screen, 6 = Gameplay
 		windowHandle = *(HWND*)0xAC6ED8;
+		bWindowedMode = *(bool*)0xAC6EFC;
 		IsOnFocus = !(*(bool*)0xAC1055);
+
+		// Center game window (frameless only)
+		if (bWindowedMode && CenterWindow && windowHandle && !once2)
+		{
+			HWND hwndScreen;
+			RECT rectScreen, rectGame;
+
+			hwndScreen = GetDesktopWindow();
+			GetWindowRect(hwndScreen, &rectScreen); // Get screen res
+			GetClientRect(windowHandle, &rectGame); // Get game res
+
+			int XPos = ((rectScreen.right - rectScreen.left) / 2 - (rectGame.right - rectGame.left) / 2);
+			int YPos = ((rectScreen.bottom - rectScreen.top) / 2 - (rectGame.bottom - rectGame.top) / 2);
+
+			SetWindowPos(windowHandle, NULL, XPos, YPos, (rectGame.right - rectGame.left), (rectGame.bottom - rectGame.top), SWP_NOZORDER);
+
+			once2 = 1;
+		}
 
 		if ((GetAsyncKeyState(hotkeyUnlockAllThings) & 1) && IsOnFocus) // Unlock All Things
 		{
