@@ -9,13 +9,13 @@
 DWORD WINAPI Thing(LPVOID);
 
 bool once1 = 0, once2 = 0, once3 = 0;
-bool bWindowedMode, CenterWindow, SkipMovies, SkipNISs, IsPlayerNameSet, ExOptsTeamTakeOver, UnlockAllThings, IsOnFocus, EnableSound, EnableMusic, EnableVoice, AutoDrive, DriftMode, ShowMessage, EnableSaveLoadHotPos, UnlockDLC, ShowAllCarsInFE, ShowSpecialVinyls, EnableDebugWorldCamera, DebugCamStatus, DebugWatchCarCamera, GarageZoom, GarageRotate, GarageShowcase;
+bool bWindowedMode, CenterWindow, SkipMovies, SkipNISs, IsPlayerNameSet, ExOptsTeamTakeOver, UnlockAllThings, IsOnFocus, EnableSound, EnableMusic, EnableVoice, AutoDrive, DriftMode, ShowMessage, EnableSaveLoadHotPos, UnlockDLC, ShowAllCarsInFE, ShowSpecialVinyls, EnableDebugWorldCamera, DebugCamStatus, DebugWatchCarCamera, GarageZoom, GarageRotate, GarageShowcase, RemoveTopSpeedLimiter;
 int ThreadDelay, StartingCash, hotkeyUnlockAllThings, hotkeyAutoDrive, hotkeyPhysSwitch, hotkeyFreezeCamera, hotkeyToggleHeadlights, MaximumLaps, MaximumRepairMarkers;
 char* IntroMovieName, *PlayerName;
 DWORD GameState;
 HWND windowHandle;
 
-char* CopyrightString = "© 2007 Electronic Arts Inc. All rights reserved.^NFSPS Extra Options - © 2019 ExOpts Team. No rights reserved.";
+char* CopyrightString = "© 2007 Electronic Arts Inc. All rights reserved.^NFSPS Extra Options - © 2021 ExOpts Team. No rights reserved.";
 DWORD _A7EBC389_New = (DWORD)CopyrightString;
 DWORD _44885A91_New;
 
@@ -32,6 +32,11 @@ int(*FE_String_PrintF)(char const* pkg_name, int obj_hash, char const* fmt, ...)
 int(*FE_String_SetLanguageHash)(char const* pkg_name, int obj_hash, int language) = (int(*)(char const*, int, int))0x5BE5F0;
 
 DWORD StringReplacementCodeCaveExit = 0x595859;
+
+int RetZero()
+{
+	return 0;
+}
 
 void __declspec(naked) StringReplacementCodeCave() // 0x595854
 {
@@ -205,9 +210,10 @@ void Init()
 	EnableDebugWorldCamera = iniReader.ReadInteger("Gameplay", "EnableDebugCamera", 0) == 1;
 	PlayerName = iniReader.ReadString("Gameplay", "PlayerName", "0");
 	StartingCash = iniReader.ReadInteger("Gameplay", "StartingCash", 10000);
-	UnlockAllThings = iniReader.ReadInteger("Gameplay", "UnlockAllThings", 1) == 1;
+	RemoveTopSpeedLimiter = iniReader.ReadInteger("Gameplay", "RemoveTopSpeedLimiter", 1) == 1;
+	UnlockAllThings = iniReader.ReadInteger("Gameplay", "UnlockAllThings", 0) == 1;
 	UnlockDLC = iniReader.ReadInteger("Gameplay", "UnlockDLC", 1) == 1;
-	ShowAllCarsInFE = iniReader.ReadInteger("Gameplay", "ShowAllCarsInFE", 1) == 1;
+	ShowAllCarsInFE = iniReader.ReadInteger("Gameplay", "ShowAllCarsInFE", 0) == 1;
 
 	// Misc
 	SkipMovies = iniReader.ReadInteger("Misc", "SkipMovies", 0) == 1;
@@ -366,6 +372,18 @@ void Init()
 	if (ShowMessage)
 	{
 		injector::WriteMemory<DWORD>(0x6E96C2, 0xA2B7D07C, true); // Fix messages not appearing
+	}
+
+	// Remove Top Speed Limiter
+	if (RemoveTopSpeedLimiter)
+	{
+		injector::WriteMemory<unsigned int>(0x0040BE15, 0, true);
+		injector::WriteMemory<unsigned int>(0x004887A3, 0, true);
+		injector::WriteMemory<unsigned int>(0x00488AA9, 0, true);
+		injector::WriteMemory<unsigned int>(0x00488AE3, 0, true);
+		injector::WriteMemory<unsigned int>(0x00718B3F, 0, true);
+		injector::WriteMemory<unsigned int>(0x0071E4E8, 0, true);
+		injector::MakeJMP(0x00402820, RetZero, true);
 	}
 
 	// Other things
