@@ -9,12 +9,12 @@
 DWORD WINAPI Thing(LPVOID);
 
 bool once1 = 0, once2 = 0, once3 = 0;
-bool bWindowedMode, CenterWindow, SkipMovies, SkipNISs, IsPlayerNameSet, ExOptsTeamTakeOver, UnlockAllThings, IsOnFocus, EnableSound, EnableMusic, EnableVoice, AutoDrive, DriftMode, ShowMessage, EnableSaveLoadHotPos, UnlockDLC, ShowAllCarsInFE, ShowSpecialVinyls, EnableDebugWorldCamera, DebugCamStatus, DebugWatchCarCamera, GarageZoom, GarageRotate, GarageShowcase, RemoveTopSpeedLimiter;
+bool bWindowedMode, SkipMovies, SkipNISs, IsPlayerNameSet, ExOptsTeamTakeOver, UnlockAllThings, IsOnFocus, EnableSound, EnableMusic, EnableVoice, AutoDrive, DriftMode, ShowMessage, EnableSaveLoadHotPos, UnlockDLC, ShowAllCarsInFE, ShowSpecialVinyls, EnableDebugWorldCamera, DebugCamStatus, DebugWatchCarCamera, GarageZoom, GarageRotate, GarageShowcase, RemoveTopSpeedLimiter;
 int ThreadDelay, StartingCash, hotkeyUnlockAllThings, hotkeyAutoDrive, hotkeyPhysSwitch, hotkeyFreezeCamera, hotkeyToggleHeadlights, MaximumLaps, MaximumRepairMarkers;
 char* IntroMovieName, * PlayerName;
 DWORD GameState;
 
-char* CopyrightString = "© 2007 Electronic Arts Inc. All rights reserved.^NFSPS Extra Options - © 2021 ExOpts Team. No rights reserved.";
+char* CopyrightString = "© 2007 Electronic Arts Inc. All rights reserved.^NFSPS Extra Options - © 2022 ExOpts Team. No rights reserved.";
 DWORD _A7EBC389_New = (DWORD)CopyrightString;
 DWORD _44885A91_New;
 
@@ -223,7 +223,6 @@ void Init()
 	ShowMessage = iniReader.ReadInteger("Misc", "ShowMessage", 1) == 1;
 	//AllowMultipleInstances = iniReader.ReadInteger("Misc", "AllowMultipleInstances", 0) == 1;
 	ThreadDelay = iniReader.ReadInteger("Misc", "ThreadDelay", 5);
-	CenterWindow = iniReader.ReadInteger("Misc", "CenterWindow", 1) == 1;
 
 	// Restrictions (wrap values around)
 	MaximumLaps %= 128;
