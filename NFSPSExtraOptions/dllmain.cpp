@@ -12,6 +12,7 @@ bool once1 = 0, once2 = 0, once3 = 0;
 bool bWindowedMode, SkipMovies, SkipNISs, IsPlayerNameSet, ExOptsTeamTakeOver, UnlockAllThings, IsOnFocus, EnableSound, EnableMusic, EnableVoice, AutoDrive, DriftMode, ShowMessage, EnableSaveLoadHotPos, UnlockDLC, ShowAllCarsInFE, ShowSpecialVinyls, EnableDebugWorldCamera, DebugCamStatus, DebugWatchCarCamera, GarageZoom, GarageRotate, GarageShowcase, RemoveTopSpeedLimiter;
 int ThreadDelay, StartingCash, hotkeyUnlockAllThings, hotkeyAutoDrive, hotkeyPhysSwitch, hotkeyFreezeCamera, hotkeyToggleHeadlights, MaximumLaps, MaximumRepairMarkers;
 char* IntroMovieName, * PlayerName;
+float CarSelectTireSteerAngle;
 DWORD GameState;
 
 char* CopyrightString = "© 2007 Electronic Arts Inc. All rights reserved.^NFSPS Extra Options - © 2022 ExOpts Team. No rights reserved.";
@@ -200,6 +201,7 @@ void Init()
 	// Menu
 	ShowSpecialVinyls = iniReader.ReadInteger("Menu", "ShowSpecialVinyls", 1) == 1;
 	IntroMovieName = iniReader.ReadString("Menu", "IntroMovie", "FE_BG");
+	CarSelectTireSteerAngle = iniReader.ReadFloat("Menu", "CarSelectTireSteerAngle", 340.0f);
 	GarageZoom = iniReader.ReadInteger("Menu", "ShowcaseCamInfiniteZoom", 0) == 1;
 	GarageRotate = iniReader.ReadInteger("Menu", "ShowcaseCamInfiniteRotation", 0) == 1;
 	GarageShowcase = iniReader.ReadInteger("Menu", "ShowcaseCamAlwaysEnable", 0) == 1;
@@ -243,6 +245,9 @@ void Init()
 
 	// Set Intro Movie Name
 	injector::WriteMemory(0x7E2CEB, IntroMovieName, true);
+
+	// Menu Front Tire Angle
+	injector::WriteMemory<float>(0xA8918C, CarSelectTireSteerAngle, true);
 
 	// Takeover
 	// Force Name
