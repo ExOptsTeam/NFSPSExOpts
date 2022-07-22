@@ -11,7 +11,7 @@ DWORD WINAPI Thing(LPVOID);
 bool once1 = 0, once2 = 0, once3 = 0;
 bool bWindowedMode, CenterWindow, SkipMovies, SkipNISs, IsPlayerNameSet, ExOptsTeamTakeOver, UnlockAllThings, IsOnFocus, EnableSound, EnableMusic, EnableVoice, AutoDrive, DriftMode, ShowMessage, EnableSaveLoadHotPos, UnlockDLC, ShowAllCarsInFE, ShowSpecialVinyls, EnableDebugWorldCamera, DebugCamStatus, DebugWatchCarCamera, GarageZoom, GarageRotate, GarageShowcase;
 int ThreadDelay, StartingCash, hotkeyUnlockAllThings, hotkeyAutoDrive, hotkeyPhysSwitch, hotkeyFreezeCamera, hotkeyToggleHeadlights, MaximumLaps, MaximumRepairMarkers;
-char* IntroMovieName, *PlayerName;
+char* IntroMovieName, * PlayerName;
 DWORD GameState;
 HWND windowHandle;
 
@@ -25,9 +25,9 @@ void(*Game_ActivateDriftMode)() = (void(*)())0x6EA9A0;
 void(*Game_DeactivateDriftMode)() = (void(*)())0x6EAA00;
 void(*Hud_ShowMessage)(char* MessageToShow) = (void(*)(char*))0x6E9630;
 void(*CameraAI_SetAction)(int EVIEW_ID, char* Action) = (void(*)(int, char*))0x6494B0;
-bool(__thiscall *PVehicle_IsGlareOn)(DWORD* PVehicle, int VehicleFXID) = (bool(__thiscall*)(DWORD*, int))0x727560;
-void(__thiscall *PVehicle_GlareOn)(DWORD* PVehicle, int VehicleFXID) = (void(__thiscall*)(DWORD*, int))0x712B30;
-void(__thiscall *PVehicle_GlareOff)(DWORD* PVehicle, int VehicleFXID) = (void(__thiscall*)(DWORD*, int))0x712B40;
+bool(__thiscall* PVehicle_IsGlareOn)(DWORD* PVehicle, int VehicleFXID) = (bool(__thiscall*)(DWORD*, int))0x727560;
+void(__thiscall* PVehicle_GlareOn)(DWORD* PVehicle, int VehicleFXID) = (void(__thiscall*)(DWORD*, int))0x712B30;
+void(__thiscall* PVehicle_GlareOff)(DWORD* PVehicle, int VehicleFXID) = (void(__thiscall*)(DWORD*, int))0x712B40;
 int(*FE_String_PrintF)(char const* pkg_name, int obj_hash, char const* fmt, ...) = (int(*)(char const*, int, char const*, ...))0x5CE4F0;
 int(*FE_String_SetLanguageHash)(char const* pkg_name, int obj_hash, int language) = (int(*)(char const*, int, int))0x5BE5F0;
 
@@ -46,35 +46,35 @@ void __declspec(naked) StringReplacementCodeCave() // 0x595854
 		jmp originalcode
 
 		ReplaceCopyrightString :
-			cmp ExOptsTeamTakeOver, 0x01
+		cmp ExOptsTeamTakeOver, 0x01
 			jne originalcode
 			cmp once1, 0x01
 			je originalcode
 
 			push edx
 			mov edx, _A7EBC389_New
-			mov dword ptr ds : [edi + eax * 0x08 + 0x04], edx
+			mov dword ptr ds : [edi + eax * 0x08 + 0x04] , edx
 			mov once1, 0x01
 			pop edx
 
 			jmp originalcode
 
-		ReplacePlayerNameString :
-			cmp IsPlayerNameSet, 0x01
+			ReplacePlayerNameString :
+		cmp IsPlayerNameSet, 0x01
 			jne originalcode
 			cmp once2, 0x01
 			je originalcode
 
 			push edx
 			mov edx, _44885A91_New
-			mov dword ptr ds : [edi + eax * 0x08 + 0x04], edx
+			mov dword ptr ds : [edi + eax * 0x08 + 0x04] , edx
 			mov once2, 0x01
 			pop edx
 
 			jmp originalcode
 
-		originalcode :
-			cmp edx, esi
+			originalcode :
+		cmp edx, esi
 			jmp StringReplacementCodeCaveExit
 
 	}
@@ -87,7 +87,7 @@ void __declspec(naked) RepairMarkerCodeCave_HighlightNextSetting()
 	_asm
 	{
 		mov edx, MaximumRepairMarkers
-		mov dword ptr ds: [ecx + eax * 8 + 0x14], edx
+		mov dword ptr ds : [ecx + eax * 8 + 0x14] , edx
 		push edi
 		jmp RepairMarkerCodeCave_HighlightNextSetting_Exit
 	}
@@ -102,21 +102,21 @@ void __declspec(naked) RepairMarkerStringCodeCave_HighlightPrevSetting()
 		cmp eax, 0x33F5A29A // SCROLL_DATA_4
 		jne originalcode
 
-		mov edx, [esp+0x10] // marker count
+		mov edx, [esp + 0x10] // marker count
 		push edx
 		push 0x96FDC0 // "{0:d}"
 		push eax // obj_hash
 		push ebx // pkg_name
 		call FE_String_PrintF
-		add esp,8
+		add esp, 8
 		jmp RepairMarkerStringCodeCave_HighlightPrevSetting_Exit
 
-		originalcode:
-			push eax
+		originalcode :
+		push eax
 			push ebx
 			call FE_String_SetLanguageHash
 
-		jmp RepairMarkerStringCodeCave_HighlightPrevSetting_Exit
+			jmp RepairMarkerStringCodeCave_HighlightPrevSetting_Exit
 	}
 }
 
@@ -140,7 +140,7 @@ void __declspec(naked) RepairMarkerStringCodeCave_HighlightNextSetting()
 		jmp RepairMarkerStringCodeCave_HighlightNextSetting_Exit
 
 		originalcode :
-			push eax
+		push eax
 			push ebx
 			call FE_String_SetLanguageHash
 
@@ -168,7 +168,7 @@ void __declspec(naked) RepairMarkerStringCodeCave_DisplayRaceDaySettings()
 		jmp RepairMarkerStringCodeCave_DisplayRaceDaySettings_Exit
 
 		originalcode :
-			push eax
+		push eax
 			push esi
 			call FE_String_SetLanguageHash
 
@@ -249,7 +249,7 @@ void Init()
 	}
 
 	injector::MakeJMP(0x595854, StringReplacementCodeCave, true);
-	
+
 	// Starting Cash
 	injector::WriteMemory<int>(0xA9DA1C, StartingCash, true);
 
@@ -468,7 +468,7 @@ DWORD WINAPI Thing(LPVOID)
 					injector::WriteMemory<unsigned char>(0x717C5D, 7, true);
 					PVehicle_GlareOn(PlayerPVehicle, 7);
 				}
-				
+
 				else // Disable headlights
 				{
 					injector::WriteMemory<unsigned char>(0x717C5D, 0, true);
@@ -609,19 +609,17 @@ BOOL APIENTRY DllMain(HMODULE /*hModule*/, DWORD reason, LPVOID /*lpReserved*/)
 	if (reason == DLL_PROCESS_ATTACH)
 	{
 		uintptr_t base = (uintptr_t)GetModuleHandleA(NULL);
-		IMAGE_DOS_HEADER* dos = (IMAGE_DOS_HEADER*)(base);
-		IMAGE_NT_HEADERS* nt = (IMAGE_NT_HEADERS*)(base + dos->e_lfanew);
 
-		if ((base + nt->OptionalHeader.AddressOfEntryPoint + (0x400000 - base)) == 0x00828C25) // Check if .exe file is compatible - Thanks to thelink2012 and MWisBest
+		if (strstr((const char*)(base + (0xA49742 - base)), "ProStreet08Release.exe"))
 			Init();
 
 		else
 		{
-			MessageBoxA(NULL, "This .exe is not supported.\nPlease use v1.1 NFS.exe from BATTERY (27,4 MB (28.739.656 bytes)).", "NFSPS Extra Options", MB_ICONERROR);
+			MessageBoxA(NULL, "This .exe is not supported.\nPlease use a NOCD v1.1 NFS.exe.", "NFSPS Extra Options", MB_ICONERROR);
 			return FALSE;
 		}
 	}
 	return TRUE;
-	
+
 }
 
